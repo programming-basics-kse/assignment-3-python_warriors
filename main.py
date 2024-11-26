@@ -21,10 +21,11 @@ def output_into_scr(file_address, medals, country, year_of_olympics, output="", 
                     dict_medals[medal_type] += 1
                 else:
                     dict_medals[medal_type] = 1
-                if output == "-output":
-                    results.append(result)
-                elif output != "-output" and counter <= 10:
-                    print(result)
+                if (medal_type == "Bronze") or (medal_type == "Silver") or (medal_type == "Gold"):
+                    if output == "-output":
+                        results.append(result)
+                    elif output != "-output" and counter < 10:
+                        print(result)
     if output != "-output":
         for medal, count in dict_medals.items():
             print(f"{medal} - {count}\n")
@@ -38,7 +39,7 @@ def output_into_scr(file_address, medals, country, year_of_olympics, output="", 
         output_from_file(text_file)
 
 
-output_into_scr("OlympicAthletes-athlete_events.tsv", "-medals", "AUT", "1976", "-output", "result.txt")
+output_into_scr("OlympicAthletes-athlete_events.tsv", "-medals", "USA", "1976", "-output", "result.txt")
 
 while True:
     user_information = input("Enter your data:\n")
