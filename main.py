@@ -1,7 +1,7 @@
 def overall(file_address, countries, output="", text_file=""):
     results = []
     list_of_countries = countries.split(" ")
-    dict_country_medals = {country: {"Gold": {}, "Silver": {}, "Bronze": {}} for country in list_of_countries}
+    dict_country_medals = {country: {} for country in list_of_countries}
     with open(file_address, 'r') as olympics_data:
         for line in olympics_data:
             list_of_information = line.split("\t")
@@ -9,18 +9,20 @@ def overall(file_address, countries, output="", text_file=""):
             medal_type = list_of_information[14].strip()
             for country in list_of_countries:
                 if country in line and medal_type in {"Gold", "Silver", "Bronze"}:
-                    if year not in dict_country_medals[country][medal_type]:
-                        dict_country_medals[country][medal_type][year] = 0
-                    else:
-                        dict_country_medals[country][medal_type][year] += 1
+                    if year not in dict_country_medals[country]:
+                        dict_country_medals[country][year] = {"Gold": 0, "Silver": 0, "Bronze": 0}
+                    dict_country_medals[country][year][medal_type] += 1
     for country in list_of_countries:
-        for medal_type in dict_country_medals[country]:
+        if country in dict_country_medals and dict_country_medals[country]:
             try:
-                max_year = max(dict_country_medals[country][medal_type], key=dict_country_medals[country][medal_type].get)
-                max_medals = dict_country_medals[country][medal_type][max_year]
+                max_year = max(dict_country_medals[country], key=lambda year: sum(dict_country_medals[country][year].values()))
+                max_medals = sum(dict_country_medals[country][max_year].values())
             except ValueError:
                 continue
-            result = f"{country} - {medal_type}: {max_year} - {max_medals}"
+            gold_medals = dict_country_medals[country][max_year]["Gold"]
+            silver_medals = dict_country_medals[country][max_year]["Silver"]
+            bronze_medals = dict_country_medals[country][max_year]["Bronze"]
+            result = f"{country} - Year with most medals: {max_year} ({max_medals} medals)\nGold: {gold_medals}, Silver: {silver_medals}, Bronze: {bronze_medals}"
             results.append(result)
             if output != "-output":
                 print(result)
@@ -37,7 +39,7 @@ def output_from_file(text_file):
             print(line)
 
 
-def output_into_scr(file_address, medals, country, year_of_olympics, output="", text_file=""):
+def output_into_scr(file_address, country, year_of_olympics, output="", text_file=""):
     dict_medals = {}
     results = []
     counter = 0
@@ -73,20 +75,3 @@ def output_into_scr(file_address, medals, country, year_of_olympics, output="", 
 
 
 overall("OlympicAthletes-athlete_events.tsv", "USA TUR GRE NED", "-output", "result.txt")
-
-while True:
-    user_information = input("Enter your data:\n")
-    data = user_information.split(" ")
-    if len(data) >= 5:
-        file_address = data[1]
-        medals = data[2]
-        country = data[3]
-        year_of_olympic = data[4]
-        if len(data) == 7:
-            output = data[5]
-            result_output = data[6]
-            output_into_scr(file_address, medals, country, year_of_olympic, output, result_output)
-        else:
-            output_into_scr(file_address, medals, country, year_of_olympic)
-    else:
-        print("Invalid input, please try again")
