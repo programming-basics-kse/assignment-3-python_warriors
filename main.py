@@ -75,19 +75,6 @@ def output_into_scr(file_address, country, year_of_olympics, output="", text_fil
                 result_file.write(f"{medal} - {count}\n")
         output_from_file(text_file)
 
-parser = argparse.ArgumentParser("Information from user about olympic data")
-
-parser.add_argument("address_file", help="File with data")
-parser.add_argument("medals")
-parser.add_argument("total", help="optional")
-parser.add_argument("overall",  help="optional")
-parser.add_argument("country", nargs="*")
-parser.add_argument("year")
-parser.add_argument("output",  help="optional")
-parser.add_argument("result_file",  help="optional")
-
-args = parser.parse_args()
-
 
 def total_medals(file_address, total, year_input, output="", result_file=""):
     result ={}
@@ -114,3 +101,36 @@ def total_medals(file_address, total, year_input, output="", result_file=""):
             for country, medal in result.items():
                 result_file.write(f"{country} - {medal_type}\n")
 
+
+parser = argparse.ArgumentParser("Information from user about olympic data")
+parser.add_argument("address_file", type=str, help="File with data")
+parser.add_argument("command", choices=["medals", "total", "overall"], help="optional")
+parser.add_argument("arg", nargs="*", help="")
+
+args = parser.parse_args()
+file_address = args.address_file
+command = args.command
+args_for_function = args.arg
+
+output_file = args_for_function[-1]
+output = args_for_function[-2]
+
+if command == "medals":
+    country = args_for_function[0]
+    year_of_olympics = args_for_function[1]
+    if len(args_for_function) == 3:
+        output_into_scr(file_address, country, year_of_olympics, output, output_file)
+    else:
+        output_into_scr(file_address, country, year_of_olympics)
+elif command == "total":
+    year_of_olympics = args_for_function[0]
+    if len(args_for_function) == 2:
+        total_medals(file_address, command, year_of_olympics, output, output_file)
+    else:
+        total_medals(file_address, command, year_of_olympics)
+elif command == "overall":
+    country = args_for_function[:-1]
+    if args_for_function[-2] == "-output" or args_for_function[-2] == "output":
+        overall(file_address, " ".join(country), output, output_file)
+    else:
+        overall(file_address, " ".join(country))
