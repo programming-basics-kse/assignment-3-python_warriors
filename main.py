@@ -1,6 +1,7 @@
 import argparse
 
-def overall(file_address, countries, output="", text_file=""):
+
+def overall(file_address, countries, text_file):
     results = []
     list_of_countries = countries.split(" ")
     dict_country_medals = {country: {} for country in list_of_countries}
@@ -26,9 +27,9 @@ def overall(file_address, countries, output="", text_file=""):
             bronze_medals = dict_country_medals[country][max_year]["Bronze"]
             result = f"{country} - Year with most medals: {max_year} ({max_medals} medals)\nGold: {gold_medals}, Silver: {silver_medals}, Bronze: {bronze_medals}"
             results.append(result)
-            if output != "-output":
+            if text_file is None:
                 print(result)
-    if output == "-output":
+    if text_file is not None:
         with open(text_file, "w") as result_file:
             for i, result in enumerate(results):
                 result_file.write(result + "\n")
@@ -41,7 +42,7 @@ def output_from_file(text_file):
             print(line)
 
 
-def output_into_scr(file_address, country, year_of_olympics, output="", text_file=""):
+def output_into_scr(file_address, country, year_of_olympics, text_file):
     dict_medals = {}
     results = []
     counter = 0
@@ -59,81 +60,74 @@ def output_into_scr(file_address, country, year_of_olympics, output="", text_fil
                     dict_medals[medal_type] = 1
                 if (medal_type == "Bronze") or (medal_type == "Silver") or (medal_type == "Gold"):
                     counter += 1
-                    if output == "-output":
+                    if text_file is not None:
                         results.append(result)
-                    elif output != "-output" and counter < 10:
+                    elif text_file is None and counter < 10:
                         print(result)
-    if output != "-output":
+    if text_file is None:
         for medal, count in dict_medals.items():
             print(f"{medal} - {count}\n")
-    if output == "-output":
+    else:
         with open(text_file, "w") as result_file:
             for i, result in enumerate(results):
-                if i <= 10:
+                if i < 10:
                     result_file.write(result + "\n")
             for medal, count in dict_medals.items():
                 result_file.write(f"{medal} - {count}\n")
         output_from_file(text_file)
 
 
-def total_medals(file_address, year_input, output="", result_file=""):
-    result ={}
-    gold = 0
-    silver = 0
-    bronze = 0
+def total_medals(file_address, year_input, result_file):
+    results = []
+    dict_for_medals = {}
     with open(file_address, 'r') as olympics_data:
         for line in olympics_data:
             data_list = line.split('\t')
-            country = data_list[6]
-            year_of_olympic = data_list[10]
+            country = data_list[7]
+            year_of_olympic = data_list[9]
             medal_type = data_list[14].strip()
-            if year_input == year_of_olympic in line:
-                for country in line:
-                    if medal_type == "Gold":
-                        gold  += 1
-                        result[country] = gold
-                    elif medal_type == "Silver":
-                        silver += 1
-                        result[country] = silver
-                    elif medal_type == "Bronze":
-                        bronze += 1
-                    result[country] = {[gold], [silver], [bronze]}
-        for country, medals in result.items():
-            print(f"{country} - {medals["gold"]} - {medals["silver"]} - {medals["bronze"]}")
-
-
-total_medals("OlympicAthletes-athlete_events.tsv", "2000")
+            if year_input == year_of_olympic:
+                if country not in dict_for_medals:
+                    dict_for_medals[country] = {"Gold": 0, "Silver": 0, "Bronze": 0}
+                if medal_type == "Gold":
+                    dict_for_medals[country][medal_type] += 1
+                elif medal_type == "Silver":
+                    dict_for_medals[country][medal_type] += 1
+                elif medal_type == "Bronze":
+                    dict_for_medals[country][medal_type] += 1
+        for country, medals in dict_for_medals.items():
+            result = f"{country} - Gold medals:{dict_for_medals[country]['Gold']} - Silver medals:{dict_for_medals[country]['Silver']} - Bronze medals:{dict_for_medals[country]['Bronze']}"
+            if result_file is None:
+                print(result)
+            else:
+                results.append(result)
+        if result_file is not None:
+            with open(result_file, "w") as file:
+                for result in results:
+                    file.write(result + "\n")
+            output_from_file(result_file)
 
 
 parser = argparse.ArgumentParser("Information from user about olympic data")
 parser.add_argument("address_file", type=str, help="File with data")
 parser.add_argument("command", choices=["medals", "total", "overall"], help="optional")
 parser.add_argument("arg", nargs="*", help="")
+parser.add_argument("-output", type=str, help="Output file", default=None)
 
 args = parser.parse_args()
 file_address = args.address_file
 command = args.command
 args_for_function = args.arg
+output_file = args.output
 
-output_file = args_for_function[-1]
-output = args_for_function[-2]
 
 if command == "medals":
     country = args_for_function[0]
     year_of_olympics = args_for_function[1]
-    if len(args_for_function) == 3:
-        output_into_scr(file_address, country, year_of_olympics, output, output_file)
-    else:
-        output_into_scr(file_address, country, year_of_olympics)
+    output_into_scr(file_address, country, year_of_olympics, output_file)
 elif command == "total":
     year_of_olympics = args_for_function[0]
-    if len(args_for_function) == 2:
-        total_medals(file_address, command, year_of_olympics, output, output_file)
-    else:
-        total_medals(file_address, command, year_of_olympics)
+    total_medals(file_address, year_of_olympics, output_file)
 elif command == "overall":
-    country = args_for_function[:-1]
-    if args_for_function[-2] == "-output" or args_for_function[-2] == "output":
-        overall(file_address, " ".join(country), output, output_file)
-    else:
-        overall(file_address, " ".join(country))
+    overall(file_address, " ".join(args_for_function), output_file)
+
