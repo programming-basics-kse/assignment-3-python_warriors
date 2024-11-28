@@ -1,5 +1,5 @@
 import argparse
-
+import sys
 
 def min_values(dict_country_medals, country):
     min_year = min(dict_country_medals[country],
@@ -143,7 +143,11 @@ def total_medals(file_address, year_input, result_file):
                 elif medal_type == "Bronze":
                     dict_for_medals[country][medal_type] += 1
         for country, medals in dict_for_medals.items():
-            result = f"{country} - Gold medals:{dict_for_medals[country]['Gold']} - Silver medals:{dict_for_medals[country]['Silver']} - Bronze medals:{dict_for_medals[country]['Bronze']}"
+            if (dict_for_medals[country]['Gold'] > 1) or (dict_for_medals[country]['Silver'] > 1) or (
+                    dict_for_medals[country]['Bronze'] > 1):
+                result = f"{country} - Gold medals:{dict_for_medals[country]['Gold']} - Silver medals:{dict_for_medals[country]['Silver']} - Bronze medals:{dict_for_medals[country]['Bronze']}"
+            else:
+                continue
             if result_file is None:
                 print(result)
             else:
@@ -163,6 +167,8 @@ parser.add_argument("-output", type=str, help="Output file", default=None)
 
 args = parser.parse_args()
 file_address = args.address_file
+if file_address != "OlympicAthletes-athlete_events.tsv":
+    sys.exit()
 command = args.command
 args_for_function = args.arg
 output_file = args.output
@@ -177,4 +183,5 @@ elif command == "total":
     total_medals(file_address, year_of_olympics, output_file)
 elif command == "overall":
     overall(file_address, " ".join(args_for_function), output_file)
-
+elif command == "interactive":
+    country = input("Please enter a country: ")
