@@ -1,42 +1,38 @@
 import argparse
 import sys
 
-def max_values(dict_country_medals, country):
-    max_year = None
+def max_min_values(dict_country_medals, country, max_or_min):
+    min_max_year = None
     max_medals = 0
-    gold_medals = silver_medals = bronze_medals = 0
-    for year, medals in dict_country_medals[country].items():
-        total_medals = medals["Gold"] + medals["Silver"] + medals["Bronze"]
-        if total_medals > max_medals:
-            max_medals = total_medals
-            max_year = year
-            gold_medals = medals["Gold"]
-            silver_medals = medals["Silver"]
-            bronze_medals = medals["Bronze"]
-    result_max = f"{country} - Year with highest numbers of medals: {max_year} ({max_medals} medals)\nGold: {gold_medals}, Silver: {silver_medals}, Bronze: {bronze_medals}"
-    return result_max
-
-
-def min_values(dict_country_medals, country):
-    min_year = None
     min_medals = float('inf')
     gold_medals = silver_medals = bronze_medals = 0
     for year, medals in dict_country_medals[country].items():
         total_medals = medals["Gold"] + medals["Silver"] + medals["Bronze"]
-        if total_medals < min_medals:
-            min_medals = total_medals
-            min_year = year
-            gold_medals = medals["Gold"]
-            silver_medals = medals["Silver"]
-            bronze_medals = medals["Bronze"]
-    result_min = f"{country} - Year with lowest numbers of medals: {min_year} ({min_medals} medals)\nGold: {gold_medals}, Silver: {silver_medals}, Bronze: {bronze_medals}"
-    return result_min
+        if max_or_min == "min":
+            if total_medals < min_medals:
+                max_medals = total_medals
+                min_max_year = year
+                gold_medals = medals["Gold"]
+                silver_medals = medals["Silver"]
+                bronze_medals = medals["Bronze"]
+        else:
+            if total_medals > max_medals:
+                min_medals = total_medals
+                min_max_year = year
+                gold_medals = medals["Gold"]
+                silver_medals = medals["Silver"]
+                bronze_medals = medals["Bronze"]
+    if max_or_min == "min":
+        result = f"{country} - Year with lowest numbers of medals: {min_max_year} ({min_medals} medals)\nGold: {gold_medals}, Silver: {silver_medals}, Bronze: {bronze_medals}"
+    else:
+        result = f"{country} - Year with highest numbers of medals: {min_max_year} ({max_medals} medals)\nGold: {gold_medals}, Silver: {silver_medals}, Bronze: {bronze_medals}"
+    return result
 
 
-def first_participation(country):
+def first_participation(country, file_address):
     list_of_year = []
     dict_country_years = {country: {}}
-    with open("OlympicAthletes-athlete_events.tsv", 'r') as olympics_data:
+    with open(file_address, 'r') as olympics_data:
         next(olympics_data)
         for line in olympics_data:
             list_of_information = line.split("\t")
@@ -93,10 +89,11 @@ def interactive(file_address, country, text_file):
                         count_of_sports += 1
                         dict_country_medals[country][year] = {"Gold": 0, "Silver": 0, "Bronze": 0, "NA": 0}
                     dict_country_medals[country][year][medal_type] += 1
-    result_max = max_values(dict_country_medals, country)
-    result_min = min_values(dict_country_medals, country)
+    result_max = max_min_values(dict_country_medals, country, "max")
+    result_min = max_min_values(dict_country_medals, country,"min")
     results_average = average_medals(dict_country_medals, country, count_of_sports, list_of_years)
     results.append(result_max)
+    results.append(result_min)
     for res in results_average:
         results.append(res)
     if text_file is None:
@@ -104,7 +101,7 @@ def interactive(file_address, country, text_file):
             print(res)
         print(result_max)
         print(result_min)
-    first_country = first_participation(country)
+    first_country = first_participation(country, file_address)
     print(first_country)
     results.append(first_country)
     if text_file is not None:
@@ -130,7 +127,7 @@ def overall(file_address, countries, text_file):
     for country in list_of_countries:
         if country in dict_country_medals and dict_country_medals[country]:
             try:
-                results_max = max_values(dict_country_medals, country)
+                results_max = max_min_values(dict_country_medals, country, "max")
             except ValueError:
                 continue
             results.append(results_max)
