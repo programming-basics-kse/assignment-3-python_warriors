@@ -17,25 +17,24 @@ def max_values(dict_country_medals, country):
     return result_max
 
 
-
 def first_participation(country):
     list_of_year = []
-    list_of_countries = country.split(" ")
     dict_country_years = {country: {}}
-    with open(file_address, 'r') as olympics_data:
+    with open("OlympicAthletes-athlete_events.tsv", 'r') as olympics_data:
+        next(olympics_data)
         for line in olympics_data:
             list_of_information = line.split("\t")
             year = list_of_information[9]
             city = list_of_information[11]
-            for country in list_of_countries:
-                if year in line and city in line and country in line:
-                    dict_country_years[country] = {year: city}
+            if (country in dict_country_years) and year not in dict_country_years[country]:
+                dict_country_years[country][year] = city
+    print(dict_country_years)
     for year in dict_country_years[country]:
         year_int = int(year)
         list_of_year.append(year_int)
     min_year = min(list_of_year)
     result = f"The first participation of {country} is {min_year} in {dict_country_years[country][year]}"
-    return result
+    print(result)
 
 
 def average_medals(dict_country_medals, country, count_of_sports, list_of_years):
