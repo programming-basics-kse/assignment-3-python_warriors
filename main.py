@@ -18,7 +18,7 @@ def max_values(dict_country_medals, country):
 
 
 
-def first_participation(country):
+def first_participation(country, file_address):
     list_of_year = []
     list_of_countries = country.split(" ")
     dict_country_years = {country: {}}
@@ -88,7 +88,7 @@ def interactive(file_address, country, text_file):
         for res in results_average:
             print(res)
         print(result_max)
-    first_country = first_participation(country)
+    first_country = first_participation(country, file_address)
     print(first_country)
     results.append(first_country)
     if text_file is not None:
@@ -183,10 +183,35 @@ def total_medals(file_address, year_input, result_file):
             write_result_into_file(result_file, results)
             output_from_file(result_file)
 
+def additional_task(file_address, list_of_data, output_file):
+    if len(list_of_data) == 1:
+        number_of_people = list_of_data[0]
+        age_category(file_address, number_of_people, output_file)
+    if len(list_of_data) == 2:
+        number_of_people = list_of_data[0]
+        gender = list_of_data[1]
+        wight_category(file_address, number_of_people, gender, output_file)
+    if len(list_of_data) == 4:
+        number_of_people = list_of_data[0]
+        gender = list_of_data[1]
+        choice = list_of_data[2]
+        number_of_choice = list_of_data[3]
+
+def age_category(file_address, number_of_people, output_file):
+    pass
+
+def wight_category(file_address, number_of_people, gender, output_file):
+    pass
+
+def height_category(file_address, number_of_people, gender, choice, number_of_choice, output_file):
+    pass
+
+
+
 
 parser = argparse.ArgumentParser("Information from user about olympic data")
 parser.add_argument("address_file", type=str, help="File with data")
-parser.add_argument("command", choices=["medals", "total", "overall", "interactive"], help="optional")
+parser.add_argument("command", choices=["medals", "total", "overall", "interactive", "top"], help="optional")
 parser.add_argument("arg", nargs="*", help="")
 parser.add_argument("-output", type=str, help="Output file", default=None)
 
@@ -211,3 +236,6 @@ elif command == "overall":
 elif command == "interactive":
     country = input("Please enter a country: ")
     interactive(file_address, country, output_file)
+elif command == "top":
+    list_of_data = args_for_function.split(" ")
+    additional_task(file_address, list_of_data, output_file)
