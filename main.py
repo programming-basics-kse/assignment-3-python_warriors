@@ -10,21 +10,21 @@ def max_min_values(dict_country_medals, country, max_or_min):
         total_medals = medals["Gold"] + medals["Silver"] + medals["Bronze"]
         if max_or_min == "min":
             if total_medals < min_medals:
-                max_medals = total_medals
+                min_medals = total_medals
                 min_max_year = year
                 gold_medals = medals["Gold"]
                 silver_medals = medals["Silver"]
                 bronze_medals = medals["Bronze"]
-        else:
+        elif max_or_min == "max":
             if total_medals > max_medals:
-                min_medals = total_medals
+                max_medals = total_medals
                 min_max_year = year
                 gold_medals = medals["Gold"]
                 silver_medals = medals["Silver"]
                 bronze_medals = medals["Bronze"]
     if max_or_min == "min":
         result = f"{country} - Year with lowest numbers of medals: {min_max_year} ({min_medals} medals)\nGold: {gold_medals}, Silver: {silver_medals}, Bronze: {bronze_medals}"
-    else:
+    elif max_or_min == "max":
         result = f"{country} - Year with highest numbers of medals: {min_max_year} ({max_medals} medals)\nGold: {gold_medals}, Silver: {silver_medals}, Bronze: {bronze_medals}"
     return result
 
