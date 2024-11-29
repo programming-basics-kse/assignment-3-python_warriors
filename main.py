@@ -16,7 +16,7 @@ parser.add_argument("-output", type=str, help="Output file", default=None)
 args = parser.parse_args()
 file_address = args.address_file
 if file_address != "OlympicAthletes-athlete_events.tsv":
-    sys.exit()
+    sys.exit("Not a valid file")
 command = args.command
 args_for_function = args.arg
 output_file = args.output

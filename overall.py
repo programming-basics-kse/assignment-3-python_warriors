@@ -1,6 +1,7 @@
 import auxiliary_function
 import work_with_file
 def overall(file_address, countries, text_file):
+    verification = 0
     results = []
     list_of_countries = countries.split(" ")
     dict_country_medals = {country: {} for country in list_of_countries}
@@ -11,6 +12,7 @@ def overall(file_address, countries, text_file):
             medal_type = list_of_information[14].strip()
             for country in list_of_countries:
                 if country in line and medal_type in {"Gold", "Silver", "Bronze"}:
+                    verification += 1
                     if year not in dict_country_medals[country]:
                         dict_country_medals[country][year] = {"Gold": 0, "Silver": 0, "Bronze": 0}
                     dict_country_medals[country][year][medal_type] += 1
@@ -23,6 +25,10 @@ def overall(file_address, countries, text_file):
             results.append(results_max)
             if text_file is None:
                 print(results_max)
+    if verification == 0:
+        if text_file is None:
+            print("Country not found! Try again.")
+        results.append("Country not found! Try again.")
     if text_file is not None:
         work_with_file.write_result_into_file(text_file, results)
         work_with_file.output_from_file(text_file)

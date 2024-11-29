@@ -21,6 +21,10 @@ def output_into_scr(file_address, country, year_of_olympics, text_file):
                         results.append(result)
                     elif text_file is None and counter <= 10:
                         print(result)
+    if counter == 0:
+        if text_file is None:
+            print("There were no winners this year.")
+        results.append("There were no winners this year.")
     for medal, count in dict_medals.items():
         number_of_medals = f"{medal} - {count}\n"
         results.append(number_of_medals)
