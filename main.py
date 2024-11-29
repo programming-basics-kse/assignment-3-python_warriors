@@ -17,6 +17,22 @@ def max_values(dict_country_medals, country):
     return result_max
 
 
+def min_values(dict_country_medals, country):
+    min_year = None
+    min_medals = float('inf')
+    gold_medals = silver_medals = bronze_medals = 0
+    for year, medals in dict_country_medals[country].items():
+        total_medals = medals["Gold"] + medals["Silver"] + medals["Bronze"]
+        if total_medals < min_medals:
+            min_medals = total_medals
+            min_year = year
+            gold_medals = medals["Gold"]
+            silver_medals = medals["Silver"]
+            bronze_medals = medals["Bronze"]
+    result_min = f"{country} - Year with lowest numbers of medals: {min_year} ({min_medals} medals)\nGold: {gold_medals}, Silver: {silver_medals}, Bronze: {bronze_medals}"
+    return result_min
+
+
 def first_participation(country):
     list_of_year = []
     dict_country_years = {country: {}}
@@ -78,6 +94,7 @@ def interactive(file_address, country, text_file):
                         dict_country_medals[country][year] = {"Gold": 0, "Silver": 0, "Bronze": 0, "NA": 0}
                     dict_country_medals[country][year][medal_type] += 1
     result_max = max_values(dict_country_medals, country)
+    result_min = min_values(dict_country_medals, country)
     results_average = average_medals(dict_country_medals, country, count_of_sports, list_of_years)
     results.append(result_max)
     for res in results_average:
@@ -86,6 +103,7 @@ def interactive(file_address, country, text_file):
         for res in results_average:
             print(res)
         print(result_max)
+        print(result_min)
     first_country = first_participation(country)
     print(first_country)
     results.append(first_country)
