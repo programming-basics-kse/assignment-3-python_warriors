@@ -28,13 +28,12 @@ def first_participation(country):
             city = list_of_information[11]
             if (country in dict_country_years) and year not in dict_country_years[country]:
                 dict_country_years[country][year] = city
-    print(dict_country_years)
     for year in dict_country_years[country]:
         year_int = int(year)
         list_of_year.append(year_int)
     min_year = min(list_of_year)
     result = f"The first participation of {country} is {min_year} in {dict_country_years[country][year]}"
-    print(result)
+    return result
 
 
 def average_medals(dict_country_medals, country, count_of_sports, list_of_years):
