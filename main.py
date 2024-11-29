@@ -18,6 +18,26 @@ def max_values(dict_country_medals, country):
 
 
 
+def first_participation(country):
+    list_of_year = []
+    list_of_countries = country.split(" ")
+    dict_country_years = {country: {}}
+    with open(file_address, 'r') as olympics_data:
+        for line in olympics_data:
+            list_of_information = line.split("\t")
+            year = list_of_information[9]
+            city = list_of_information[11]
+            for country in list_of_countries:
+                if year in line and city in line and country in line:
+                    dict_country_years[country] = {year: city}
+    for year in dict_country_years[country]:
+        year_int = int(year)
+        list_of_year.append(year_int)
+    min_year = min(list_of_year)
+    result = f"The first participation of {country} is {min_year} in {dict_country_years[country][year]}"
+    return result
+
+
 def average_medals(dict_country_medals, country, count_of_sports, list_of_years):
     results = []
     for year in list_of_years:
@@ -68,6 +88,9 @@ def interactive(file_address, country, text_file):
         for res in results_average:
             print(res)
         print(result_max)
+    first_country = first_participation(country)
+    print(first_country)
+    results.append(first_country)
     if text_file is not None:
         write_result_into_file(text_file, results)
         output_from_file(text_file)
