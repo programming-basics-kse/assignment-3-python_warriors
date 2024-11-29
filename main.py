@@ -1,54 +1,75 @@
 import argparse
 import sys
 
-def min_values(dict_country_medals, country):
-    min_year = min(dict_country_medals[country],
-                   key=lambda year: sum(dict_country_medals[country][year].values()))
-    min_medals = sum(dict_country_medals[country][min_year].values())
-    gold_medals_min = dict_country_medals[country][min_year]["Gold"]
-    silver_medals_min = dict_country_medals[country][min_year]["Silver"]
-    bronze_medals_min = dict_country_medals[country][min_year]["Bronze"]
-    return min_year, min_medals, gold_medals_min, silver_medals_min, bronze_medals_min
-
-
 def max_values(dict_country_medals, country):
-    max_year = max(dict_country_medals[country],
-                   key=lambda year: sum(dict_country_medals[country][year].values()))
-    max_medals = sum(dict_country_medals[country][max_year].values())
-    gold_medals = dict_country_medals[country][max_year]["Gold"]
-    silver_medals = dict_country_medals[country][max_year]["Silver"]
-    bronze_medals = dict_country_medals[country][max_year]["Bronze"]
-    return max_year, max_medals, gold_medals, silver_medals, bronze_medals
+    max_year = None
+    max_medals = 0
+    gold_medals = silver_medals = bronze_medals = 0
+    for year, medals in dict_country_medals[country].items():
+        total_medals = medals["Gold"] + medals["Silver"] + medals["Bronze"]
+        if total_medals > max_medals:
+            max_medals = total_medals
+            max_year = year
+            gold_medals = medals["Gold"]
+            silver_medals = medals["Silver"]
+            bronze_medals = medals["Bronze"]
+    result_max = f"{country} - Year with highest numbers of medals: {max_year} ({max_medals} medals)\nGold: {gold_medals}, Silver: {silver_medals}, Bronze: {bronze_medals}"
+    return result_max
 
 
-def interactive(country):
+
+def average_medals(dict_country_medals, country, count_of_sports, list_of_years):
     results = []
-    list_of_countries = country.split(" ")
-    dict_country_medals = {country: {} for country in list_of_countries}
+    for year in list_of_years:
+        if year in dict_country_medals[country]:
+            average_gold_medals = dict_country_medals[country][year]["Gold"] / count_of_sports
+            average_silver_medals = dict_country_medals[country][year]["Silver"] / count_of_sports
+            average_bronze_medals = dict_country_medals[country][year]["Bronze"] / count_of_sports
+            result = f"Average in {year}:\n Gold medals: {average_gold_medals}\n Silver medals: {average_silver_medals}\n Bronze medals: {average_bronze_medals}\n"
+            results.append(result)
+    return results
+
+
+def write_result_into_file(result_file, results):
+    with open(result_file, "w") as file:
+        for i, result in enumerate(results):
+            file.write(result + "\n")
+
+
+def output_from_file(text_file):
+    with open(text_file, 'r') as result:
+        for line in result:
+            print(line)
+
+def interactive(file_address, country, text_file):
+    count_of_sports = 0
+    list_of_years = []
+    results = []
+    dict_country_medals = {country: {}}
     with open(file_address, 'r') as olympics_data:
         for line in olympics_data:
             list_of_information = line.split("\t")
             year = list_of_information[9]
             medal_type = list_of_information[14].strip()
-            for country in list_of_countries:
-                if country in line and medal_type in {"Gold", "Silver", "Bronze"}:
+            if year not in list_of_years:
+                list_of_years.append(year)
+            for country in dict_country_medals:
+                if country in line:
                     if year not in dict_country_medals[country]:
-                        dict_country_medals[country][year] = {"Gold": 0, "Silver": 0, "Bronze": 0}
+                        count_of_sports += 1
+                        dict_country_medals[country][year] = {"Gold": 0, "Silver": 0, "Bronze": 0, "NA": 0}
                     dict_country_medals[country][year][medal_type] += 1
-    for country in list_of_countries:
-        if country in dict_country_medals and dict_country_medals[country]:
-            try:
-                max_year, max_medals, gold_medals, silver_medals, bronze_medals= max_values(dict_country_medals,
-                                                                                             country)
-                min_year, min_medals, gold_medals_min, silver_medals_min, bronze_medals_min = min_values(dict_country_medals,
-                                                                                             country)
-            except ValueError:
-                continue
-            result_max = f"{country} - Year with highest numbers of medals: {max_year} ({max_medals} medals)\nGold: {gold_medals}, Silver: {silver_medals}, Bronze: {bronze_medals}"
-            result_min = f"{country} - Year with highest numbers of medals: {min_year} ({min_medals} medals)\nGold: {gold_medals_min}, Silver: {silver_medals_min}, Bronze: {bronze_medals_min}"
-            results.append(result_max)
-            results.append(result_min)
-            print(result_max +"\n" + result_min)
+    result_max = max_values(dict_country_medals, country)
+    results_average = average_medals(dict_country_medals, country, count_of_sports, list_of_years)
+    for res in results_average:
+        results.append(res)
+    if text_file is None:
+        for res in results_average:
+            print(res)
+        print(result_max)
+    if text_file is not None:
+        write_result_into_file(text_file, results)
+        output_from_file(text_file)
 
 
 
@@ -69,24 +90,15 @@ def overall(file_address, countries, text_file):
     for country in list_of_countries:
         if country in dict_country_medals and dict_country_medals[country]:
             try:
-                max_year, max_medals, gold_medals, silver_medals, bronze_medals = max_values(dict_country_medals, country)
+                results_max = max_values(dict_country_medals, country)
             except ValueError:
                 continue
-            result = f"{country} - Year with highest numbers of medals: {max_year} ({max_medals} medals)\nGold: {gold_medals}, Silver: {silver_medals}, Bronze: {bronze_medals}"
-            results.append(result)
+            results.append(results_max)
             if text_file is None:
-                print(result)
+                print(results_max)
     if text_file is not None:
-        with open(text_file, "w") as result_file:
-            for i, result in enumerate(results):
-                result_file.write(result + "\n")
+        write_result_into_file(text_file, results)
         output_from_file(text_file)
-
-
-def output_from_file(text_file):
-    with open(text_file, 'r') as result:
-        for line in result:
-            print(line)
 
 
 def output_into_scr(file_address, country, year_of_olympics, text_file):
@@ -107,20 +119,17 @@ def output_into_scr(file_address, country, year_of_olympics, text_file):
                     dict_medals[medal_type] = 1
                 if (medal_type == "Bronze") or (medal_type == "Silver") or (medal_type == "Gold"):
                     counter += 1
-                    if text_file is not None:
+                    if text_file is not None and counter <= 10:
                         results.append(result)
-                    elif text_file is None and counter < 10:
+                    elif text_file is None and counter <= 10:
                         print(result)
-    if text_file is None:
-        for medal, count in dict_medals.items():
-            print(f"{medal} - {count}\n")
-    else:
-        with open(text_file, "w") as result_file:
-            for i, result in enumerate(results):
-                if i < 10:
-                    result_file.write(result + "\n")
-            for medal, count in dict_medals.items():
-                result_file.write(f"{medal} - {count}\n")
+    for medal, count in dict_medals.items():
+        number_of_medals = f"{medal} - {count}\n"
+        results.append(number_of_medals)
+        if text_file is None:
+            print(number_of_medals)
+    if text_file is not None:
+        write_result_into_file(text_file, results)
         output_from_file(text_file)
 
 
@@ -136,26 +145,18 @@ def total_medals(file_address, year_input, result_file):
             if year_input == year_of_olympic:
                 if country not in dict_for_medals:
                     dict_for_medals[country] = {"Gold": 0, "Silver": 0, "Bronze": 0}
-                if medal_type == "Gold":
-                    dict_for_medals[country][medal_type] += 1
-                elif medal_type == "Silver":
-                    dict_for_medals[country][medal_type] += 1
-                elif medal_type == "Bronze":
+                if medal_type in dict_for_medals[country]:
                     dict_for_medals[country][medal_type] += 1
         for country, medals in dict_for_medals.items():
             if (dict_for_medals[country]['Gold'] > 1) or (dict_for_medals[country]['Silver'] > 1) or (
                     dict_for_medals[country]['Bronze'] > 1):
                 result = f"{country} - Gold medals:{dict_for_medals[country]['Gold']} - Silver medals:{dict_for_medals[country]['Silver']} - Bronze medals:{dict_for_medals[country]['Bronze']}"
-            else:
-                continue
             if result_file is None:
                 print(result)
             else:
                 results.append(result)
         if result_file is not None:
-            with open(result_file, "w") as file:
-                for result in results:
-                    file.write(result + "\n")
+            write_result_into_file(result_file, results)
             output_from_file(result_file)
 
 
@@ -185,3 +186,4 @@ elif command == "overall":
     overall(file_address, " ".join(args_for_function), output_file)
 elif command == "interactive":
     country = input("Please enter a country: ")
+    interactive(file_address, country, output_file)
