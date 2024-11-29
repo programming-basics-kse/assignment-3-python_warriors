@@ -186,11 +186,11 @@ def total_medals(file_address, year_input, result_file):
 def additional_task(file_address, list_of_data, output_file):
     if len(list_of_data) == 1:
         number_of_people = list_of_data[0]
-        winners(file_address, number_of_people, output_file)
+        winners(file_address, number_of_people, output_file, gender=None)
     if len(list_of_data) == 2:
         number_of_people = list_of_data[0]
         gender = list_of_data[1]
-        winners_gender(file_address, number_of_people, gender, output_file)
+        winners(file_address, number_of_people, gender, output_file)
     if len(list_of_data) == 4:
         number_of_people = list_of_data[0]
         gender = list_of_data[1]
@@ -198,11 +198,9 @@ def additional_task(file_address, list_of_data, output_file):
         number_of_choice = list_of_data[3]
         category(file_address, number_of_people, gender, choice, number_of_choice, output_file)
 
-def winners(file_address, number_of_people, output_file):
+def winners(file_address, number_of_people, output_file, gender):
     pass
 
-def winners_gender(file_address, number_of_people, gender, output_file):
-    pass
 
 def category(file_address, number_of_people, gender, choice, number_of_choice, output_file):
     pass
