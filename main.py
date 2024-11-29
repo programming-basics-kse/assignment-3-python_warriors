@@ -21,6 +21,26 @@ def max_values(dict_country_medals, country):
     return max_year, max_medals, gold_medals, silver_medals, bronze_medals
 
 
+def first_participation(country):
+    list_of_year = []
+    list_of_countries = country.split(" ")
+    dict_country_years = {country: {}}
+    with open(file_address, 'r') as olympics_data:
+        for line in olympics_data:
+            list_of_information = line.split("\t")
+            year = list_of_information[9]
+            city = list_of_information[11]
+            for country in list_of_countries:
+                if year in line and city in line:
+                    dict_country_years[country] = {year: city}
+    for year in dict_country_years[country]:
+        list_of_year.append(year)
+    min_year = min(list_of_year)
+    for min_year in dict_country_years[country]:
+        print(f"The first participation of {country} is {min_year} in {dict_country_years[country][year]}")
+
+
+
 def interactive(country):
     results = []
     list_of_countries = country.split(" ")
