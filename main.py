@@ -61,6 +61,7 @@ def interactive(file_address, country, text_file):
                     dict_country_medals[country][year][medal_type] += 1
     result_max = max_values(dict_country_medals, country)
     results_average = average_medals(dict_country_medals, country, count_of_sports, list_of_years)
+    results.append(result_max)
     for res in results_average:
         results.append(res)
     if text_file is None:
