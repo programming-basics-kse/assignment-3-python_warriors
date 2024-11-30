@@ -1,7 +1,7 @@
 import work_with_file as wf
 
 def additional_task(file_address, list_of_data, output_file):
-    number_of_people = list_of_data[0]
+    number_of_people = int(list_of_data[0])
     if len(list_of_data) == 1:
         winners(file_address, number_of_people, output_file, gender=None)
     if len(list_of_data) == 2:
@@ -9,15 +9,19 @@ def additional_task(file_address, list_of_data, output_file):
         winners(file_address, number_of_people, output_file, gender)
     if len(list_of_data) == 4:
         gender = list_of_data[1]
-        choice = list_of_data[2]
-        number_of_choice = list_of_data[3]
-        category(file_address, number_of_people, gender, choice, number_of_choice, output_file)
+        number_of_choice = " ".join(list_of_data[2:])
+        dict_choice = drop(number_of_choice)
+        if dict_choice is not None:
+            category(file_address, number_of_people, gender, number_of_choice, output_file)
+        else:
+            print("Invalid category format.")
 
 def winners(file_address, number_of_people, output_file, gender, category_filter=None):
     winners = []
     medals = {}
     counter = 0
     with open(file_address, "r") as olympic:
+        next(olympic)
         for line in olympic:
             list_of_information = line.split("\t")
             medal_type = list_of_information[14].strip()
@@ -105,7 +109,7 @@ def category(file_address, number_of_people, gender, number_of_category, output_
 
 def drop(number_of_category):
     number_of_category = number_of_category.split(" ")
-    if len(number_of_category) == 1:
+    if len(number_of_category) % 2 != 0:
         return None
     else:
         dict_choice = {}
