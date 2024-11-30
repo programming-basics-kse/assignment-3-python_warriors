@@ -65,11 +65,11 @@ def winners(file_address, number_of_people, output_file, gender, category_filter
                         medals[name] = {"Gold": 0, "Silver": 0, "Bronze": 0}
                     medals[name][medal_type] += 1
                     if medals[name]["Gold"] > 3 or medals[name]["Silver"] > 3 or medals[name]["Bronze"] > 3:
-                        if counter < number_of_people:
+                        if counter < int(number_of_people):
                             counter += 1
-                            if output_file is not None and counter <= number_of_people:
+                            if output_file is not None and counter <= int(number_of_people):
                                 winners.append(result)
-                            elif output_file is None and counter <= number_of_people:
+                            elif output_file is None and counter <= int(number_of_people):
                                 print(result)
     if output_file is not None:
         wf.write_result_into_file(output_file, winners)

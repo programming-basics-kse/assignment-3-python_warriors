@@ -35,5 +35,5 @@ elif command == "interactive":
     country = input("Please enter a country: ")
     interactive.interactive(file_address, country, output_file)
 elif command == "top":
-    list_of_data = args_for_function.split(" ")
+    list_of_data = args_for_function
     at.additional_task(file_address, list_of_data, output_file)
